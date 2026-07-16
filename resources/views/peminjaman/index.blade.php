@@ -316,17 +316,6 @@
 
     </div>
 
-    <script>
-
-        function openTambahModal() {
-            document.getElementById('tambahModal').classList.remove('hidden');
-            document.getElementById('tambahModal').classList.add('flex');
-        }
-
-        function closeTambahModal() {
-            document.getElementById('tambahModal').classList.add('hidden');
-            document.getElementById('tambahModal').classList.remove('flex');
-        }
 
         <!-- Modal Edit -->
 <div id="editModal"
@@ -338,18 +327,13 @@
             Edit Peminjaman
         </h2>
 
-
         <form id="editForm" method="POST">
 
             @csrf
             @method('PUT')
 
-
             <div class="mb-4">
-
-                <label class="block mb-2">
-                    Nama Peminjam
-                </label>
+                <label class="block mb-2">Nama Peminjam</label>
 
                 <input
                     id="edit_nama_peminjam"
@@ -357,39 +341,28 @@
                     name="nama_peminjam"
                     class="w-full border rounded-lg px-4 py-2"
                     required>
-
             </div>
 
-
             <div class="mb-4">
-
-                <label class="block mb-2">
-                    Barang
-                </label>
+                <label class="block mb-2">Barang</label>
 
                 <select
                     id="edit_barang_id"
                     name="barang_id"
-                    class="w-full border rounded-lg px-4 py-2">
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
 
                     @foreach($barang as $b)
-
-                    <option value="{{ $b->id }}">
-                        {{ $b->nama_barang }}
-                    </option>
-
+                        <option value="{{ $b->id }}">
+                            {{ $b->nama_barang }}
+                        </option>
                     @endforeach
 
                 </select>
-
             </div>
 
-
             <div class="mb-4">
-
-                <label class="block mb-2">
-                    Jumlah
-                </label>
+                <label class="block mb-2">Jumlah</label>
 
                 <input
                     id="edit_jumlah"
@@ -397,64 +370,122 @@
                     name="jumlah"
                     class="w-full border rounded-lg px-4 py-2"
                     required>
-
             </div>
 
-
             <div class="mb-4">
-
-                <label class="block mb-2">
-                    Status
-                </label>
+                <label class="block mb-2">Status</label>
 
                 <select
                     id="edit_status"
                     name="status"
-                    class="w-full border rounded-lg px-4 py-2">
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
 
-                    <option value="Dipinjam">
-                        Dipinjam
-                    </option>
-
-                    <option value="Dikembalikan">
-                        Dikembalikan
-                    </option>
+                    <option value="Dipinjam">Dipinjam</option>
+                    <option value="Dikembalikan">Dikembalikan</option>
 
                 </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mt-4">
+
+                <div>
+                    <label class="block mb-2">
+                        Tanggal Pinjam
+                    </label>
+
+                    <input
+                        id="edit_tanggal_pinjam"
+                        type="date"
+                        name="tanggal_pinjam"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
+                </div>
+
+                <div>
+                    <label class="block mb-2">
+                        Tanggal Kembali
+                    </label>
+
+                    <input
+                        id="edit_tanggal_kembali"
+                        type="date"
+                        name="tanggal_kembali"
+                        class="w-full border rounded-lg px-4 py-2">
+                </div>
 
             </div>
 
+            <div class="mt-4">
 
-            <div class="flex justify-end gap-3">
+                <label class="block mb-2">
+                    Keterangan
+                </label>
+
+                <textarea
+                    id="edit_keterangan"
+                    name="keterangan"
+                    rows="3"
+                    class="w-full border rounded-lg px-4 py-2"></textarea>
+
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6">
 
                 <button
                     type="button"
                     onclick="closeEditModal()"
-                    class="bg-gray-500 text-white px-5 py-2 rounded-lg">
-
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
                     Batal
-
                 </button>
-
 
                 <button
                     type="submit"
-                    class="bg-blue-600 text-white px-5 py-2 rounded-lg">
-
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
                     Update
-
                 </button>
 
             </div>
 
-
         </form>
-
 
     </div>
 
 </div>
 
-    </script>
+<script>
+
+function openTambahModal() {
+    document.getElementById('tambahModal').classList.remove('hidden');
+    document.getElementById('tambahModal').classList.add('flex');
+}
+
+function closeTambahModal() {
+    document.getElementById('tambahModal').classList.add('hidden');
+    document.getElementById('tambahModal').classList.remove('flex');
+}
+
+function openEditModal(id, nama, barang, jumlah, tanggal, kembali, status, keterangan) {
+
+    document.getElementById('editModal').classList.remove('hidden');
+    document.getElementById('editModal').classList.add('flex');
+
+    document.getElementById('editForm').action = '/peminjaman/' + id;
+
+    document.getElementById('edit_nama_peminjam').value = nama;
+    document.getElementById('edit_barang_id').value = barang;
+    document.getElementById('edit_jumlah').value = jumlah;
+    document.getElementById('edit_status').value = status;
+    document.getElementById('edit_tanggal_pinjam').value = tanggal;
+    document.getElementById('edit_tanggal_kembali').value = kembali ?? '';
+    document.getElementById('edit_keterangan').value = keterangan ?? '';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+    document.getElementById('editModal').classList.remove('flex');
+}
+
+</script>
 
 </x-app-layout>

@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,6 +22,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('barang', BarangController::class);
 
     Route::resource('peminjaman', PeminjamanController::class);
+
+    Route::resource('pengembalian', PengembalianController::class);
 
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
