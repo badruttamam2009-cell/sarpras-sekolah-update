@@ -19,7 +19,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
+                <div class="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
                     {{ session('success') }}
                 </div>
             @endif
@@ -32,7 +32,9 @@
 
                         <tr>
 
-                            <th class="px-6 py-3 text-left">Kode</th>
+                            <th class="px-6 py-3 text-left">No</th>
+
+                            <th class="px-6 py-3 text-left">Kode Barang</th>
 
                             <th class="px-6 py-3 text-left">Nama Barang</th>
 
@@ -52,9 +54,13 @@
 
                     <tbody>
 
-                        @forelse($barang as $item)
+                    @forelse($barang as $item)
 
                         <tr class="border-b hover:bg-gray-50">
+
+                            <td class="px-6 py-4">
+                                {{ $loop->iteration }}
+                            </td>
 
                             <td class="px-6 py-4">
                                 {{ $item->kode_barang }}
@@ -100,27 +106,53 @@
                                 {{ $item->keterangan }}
                             </td>
 
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-6 py-4">
 
-                                <button
-                                    class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
-                                    Edit
-                                </button>
+                                <div class="flex justify-center gap-2">
 
-                                <button
-                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-                                    Hapus
-                                </button>
+                                    <button
+                                        onclick="openEditModal(
+                                            '{{ $item->id }}',
+                                            '{{ $item->nama_barang }}',
+                                            '{{ $item->ruangan_id }}',
+                                            '{{ $item->jumlah }}',
+                                            '{{ $item->kondisi }}',
+                                            '{{ $item->keterangan }}'
+                                        )"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
+
+                                        Edit
+
+                                    </button>
+
+                                    <form
+                                        action="{{ route('barang.destroy', $item->id) }}"
+                                        method="POST"
+                                        onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+
+                                            Hapus
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
 
                             </td>
 
                         </tr>
 
-                        @empty
+                    @empty
 
                         <tr>
 
-                            <td colspan="7"
+                            <td colspan="8"
                                 class="text-center py-8 text-gray-500">
 
                                 Belum ada data barang.
@@ -129,7 +161,7 @@
 
                         </tr>
 
-                        @endforelse
+                    @endforelse
 
                     </tbody>
 
@@ -140,40 +172,374 @@
         </div>
 
     </div>
-<!-- Modal Tambah Barang -->
-    <div id="tambahModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
 
-        <div class="bg-white rounded-lg p-6 w-96">
+    {{-- PART 2 DIMULAI DI SINI --}}
 
-            <h2 class="text-xl font-bold mb-4">
-                Tambah Barang
+    <!-- ===========================
+        MODAL TAMBAH
+============================ -->
+
+<div id="modalTambah"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+
+        <div class="flex justify-between items-center mb-5">
+
+            <h2 class="text-xl font-bold">
+                Tambah Data Barang
             </h2>
 
-            <form>
-                <input 
-                    type="text"
-                    placeholder="Kode Barang"
-                    class="border w-full p-2 mb-3 rounded">
+            <button
+                onclick="closeTambahModal()"
+                class="text-2xl text-gray-500 hover:text-red-600">
 
-                <input 
-                    type="text"
-                    placeholder="Nama Barang"
-                    class="border w-full p-2 mb-3 rounded">
+                &times;
 
-                <button
-                    type="submit"
-                    class="bg-blue-600 text-white px-4 py-2 rounded">
-                    Simpan
-                </button>
-
-            </form>
+            </button>
 
         </div>
 
+        <form
+            action="{{ route('barang.store') }}"
+            method="POST">
+
+            @csrf
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Nama Barang
+                </label>
+
+                <input
+                    type="text"
+                    name="nama_barang"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Ruangan
+                </label>
+
+                <select
+                    name="ruangan_id"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+                    <option value="">
+                        -- Pilih Ruangan --
+                    </option>
+
+                    @foreach($ruangan as $r)
+
+                        <option value="{{ $r->id }}">
+                            {{ $r->nama_ruangan }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Jumlah
+                </label>
+
+                <input
+                    type="number"
+                    name="jumlah"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Kondisi
+                </label>
+
+                <select
+                    name="kondisi"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+                    <option value="Baik">
+                        Baik
+                    </option>
+
+                    <option value="Rusak Ringan">
+                        Rusak Ringan
+                    </option>
+
+                    <option value="Rusak Berat">
+                        Rusak Berat
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Keterangan
+                </label>
+
+                <textarea
+                    name="keterangan"
+                    rows="3"
+                    class="w-full border rounded-lg px-4 py-2"></textarea>
+
+            </div>
+
+            <div class="flex justify-end gap-3">
+
+                <button
+                    type="button"
+                    onclick="closeTambahModal()"
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
+
+                    Batal
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
+
+                    Simpan
+
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
+
+</div>
+
+<!-- ===========================
+        MODAL EDIT
+============================ -->
+
+<div id="modalEdit"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+
+        <div class="flex justify-between items-center mb-5">
+
+            <h2 class="text-xl font-bold">
+                Edit Data Barang
+            </h2>
+
+            <button
+                onclick="closeEditModal()"
+                class="text-2xl text-gray-500 hover:text-red-600">
+
+                &times;
+
+            </button>
+
+        </div>
+
+        <form
+            id="formEdit"
+            method="POST">
+
+            @csrf
+            @method('PUT')
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Nama Barang
+                </label>
+
+                <input
+                    type="text"
+                    id="edit_nama_barang"
+                    name="nama_barang"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Ruangan
+                </label>
+
+                <select
+                    id="edit_ruangan"
+                    name="ruangan_id"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+                    @foreach($ruangan as $r)
+
+                        <option value="{{ $r->id }}">
+                            {{ $r->nama_ruangan }}
+                        </option>
+
+                    @endforeach
+
+                </select>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Jumlah
+                </label>
+
+                <input
+                    type="number"
+                    id="edit_jumlah"
+                    name="jumlah"
+                    class="w-full border rounded-lg px-4 py-2"
+                    required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Kondisi
+                </label>
+
+                <select
+                    id="edit_kondisi"
+                    name="kondisi"
+                    class="w-full border rounded-lg px-4 py-2">
+
+                    <option value="Baik">Baik</option>
+                    <option value="Rusak Ringan">Rusak Ringan</option>
+                    <option value="Rusak Berat">Rusak Berat</option>
+
+                </select>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="block mb-2 font-medium">
+                    Keterangan
+                </label>
+
+                <textarea
+                    id="edit_keterangan"
+                    name="keterangan"
+                    rows="3"
+                    class="w-full border rounded-lg px-4 py-2"></textarea>
+
+            </div>
+
+            <div class="flex justify-end gap-3">
+
+                <button
+                    type="button"
+                    onclick="closeEditModal()"
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
+
+                    Batal
+
+                </button>
+
+                <button
+                    type="submit"
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg">
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
 <script>
-    function openTambahModal(){
-        document.getElementById('tambahModal').classList.remove('hidden');
+
+function openTambahModal() {
+
+    const modal = document.getElementById('modalTambah');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+}
+
+function closeTambahModal() {
+
+    const modal = document.getElementById('modalTambah');
+
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+
+}
+
+function openEditModal(id, nama_barang, ruangan_id, jumlah, kondisi, keterangan) {
+
+    document.getElementById('edit_nama_barang').value = nama_barang;
+    document.getElementById('edit_ruangan').value = ruangan_id;
+    document.getElementById('edit_jumlah').value = jumlah;
+    document.getElementById('edit_kondisi').value = kondisi;
+    document.getElementById('edit_keterangan').value = keterangan;
+
+    document.getElementById('formEdit').action = "/barang/" + id;
+
+    const modal = document.getElementById('modalEdit');
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+}
+
+function closeEditModal() {
+
+    const modal = document.getElementById('modalEdit');
+
+    modal.classList.remove('flex');
+    modal.classList.add('hidden');
+
+}
+
+// Menutup modal jika klik area hitam
+window.onclick = function(event) {
+
+    const modalTambah = document.getElementById('modalTambah');
+    const modalEdit = document.getElementById('modalEdit');
+
+    if(event.target == modalTambah){
+
+        closeTambahModal();
+
     }
+
+    if(event.target == modalEdit){
+
+        closeEditModal();
+
+    }
+
+}
+
 </script>
+
 </x-app-layout>

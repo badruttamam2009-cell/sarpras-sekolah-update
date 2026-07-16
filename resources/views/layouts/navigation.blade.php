@@ -10,14 +10,25 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+               <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
-                    </x-nav-link>  <x-nav-link :href="route('ruangan.index')" :active="request()->routeIs('ruangan.*')">
-                          {{ __('Ruangan') }}
-                     </x-nav-link>
-                </div>
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('ruangan.index')" :active="request()->routeIs('ruangan.*')">
+                            {{ __('Ruangan') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('barang.index')" :active="request()->routeIs('barang.*')">
+                                {{ __('Barang') }}
+                    </x-nav-link>
+
+                    <x-nav-link :href="route('peminjaman.index')" :active="request()->routeIs('peminjaman.*')">
+                            {{ __('Peminjaman') }}
+                    </x-nav-link>
+
             </div>
 
             <!-- Settings Dropdown -->
