@@ -35,6 +35,10 @@
                         Pengembalian
                     </x-nav-link>
 
+                    <x-nav-link :href="route('user.index')" :active="request()->routeIs('user.*')">
+                        {{ __('User') }}
+                    </x-nav-link>
+
                 </div>
 
             </div>
@@ -144,6 +148,10 @@
 
             <x-responsive-nav-link :href="route('pengembalian.index')" :active="request()->routeIs('pengembalian.*')">
                 Pengembalian
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('user.index')" :active="request()->routeIs('user.*')">
+                User
             </x-responsive-nav-link>
 
         </div>
