@@ -26,11 +26,11 @@
 
             @if(session('success'))
 
-                <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
+            <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
 
-                    {{ session('success') }}
+                {{ session('success') }}
 
-                </div>
+            </div>
 
             @endif
 
@@ -72,84 +72,83 @@
 
                     <tbody>
 
-                    @foreach($pengembalian as $item)
+                        @foreach($pengembalian as $item)
 
-<tr class="border-b hover:bg-gray-50">
+                        <tr class="border-b hover:bg-gray-50">
 
-    <td class="px-6 py-4 text-center">
-        {{ $loop->iteration }}
-    </td>
+                            <td class="px-6 py-4 text-center">
+                                {{ $loop->iteration }}
+                            </td>
 
-    <td class="px-6 py-4">
-        {{ $item->peminjaman->nama_peminjam }}
-    </td>
+                            <td class="px-6 py-4">
+                                {{ $item->peminjaman->nama_peminjam }}
+                            </td>
 
-    <td class="px-6 py-4">
-        {{ $item->peminjaman->barang->nama_barang }}
-    </td>
+                            <td class="px-6 py-4">
+                                {{ $item->peminjaman->barang->nama_barang }}
+                            </td>
 
-    <td class="px-6 py-4 text-center">
-        {{ $item->tanggal_pengembalian }}
-    </td>
+                            <td class="px-6 py-4 text-center">
+                                {{ $item->tanggal_pengembalian }}
+                            </td>
 
-    <td class="px-6 py-4">
-        {{ $item->keterangan ?? '-' }}
-    </td>
+                            <td class="px-6 py-4">
+                                {{ $item->keterangan ?? '-' }}
+                            </td>
 
-    <td class="px-6 py-4">
+                            <td class="px-6 py-4">
 
-        <div class="flex justify-center gap-2">
+                                @if(Auth::user()->role == 'admin')
 
-            <button
-                onclick="openEditModal(
-                    {{ $item->id }},
-                    '{{ $item->tanggal_pengembalian }}',
-                    '{{ $item->keterangan }}'
-                )"
-                class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
+                                <div class="flex justify-center gap-2">
 
-                Edit
+                                    <button
+                                        onclick="openEditModal(
+        '{{ $item->id }}',
+        '{{ $item->nama_ruangan }}',
+        '{{ $item->lantai }}',
+        '{{ $item->keterangan }}'
+        )"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
+                                        Edit
+                                    </button>
 
-            </button>
+                                    <form action="{{ route('ruangan.destroy', $item->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
 
-            <form action="{{ route('pengembalian.destroy', $item->id) }}" method="POST">
+                                        <button
+                                            onclick="return confirm('Yakin ingin menghapus data ini?')"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                            Hapus
+                                        </button>
+                                    </form>
 
-                @csrf
-                @method('DELETE')
+                                </div>
 
-                <button
-                    onclick="return confirm('Yakin ingin menghapus data ini?')"
-                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                @endif
 
-                    Hapus
+                            </td>
 
-                </button>
+                        </tr>
 
-            </form>
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
 
-    </td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
     <!-- Modal Tambah -->
     <div id="tambahModal"
-         class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 overflow-y-auto p-4">
 
-        <div class="bg-white rounded-xl w-full max-w-lg p-6">
+        <div class="bg-white rounded-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto my-8">
 
             <h2 class="text-xl font-bold mb-5">
                 Tambah Pengembalian
@@ -181,13 +180,13 @@
 
                         @foreach($peminjaman as $p)
 
-                            <option value="{{ $p->id }}">
+                        <option value="{{ $p->id }}">
 
-                                {{ $p->nama_peminjam }}
-                                -
-                                {{ $p->barang->nama_barang }}
+                            {{ $p->nama_peminjam }}
+                            -
+                            {{ $p->barang->nama_barang }}
 
-                            </option>
+                        </option>
 
                         @endforeach
 
@@ -268,10 +267,10 @@
     <!-- Modal Edit -->
 
     <div id="editModal"
-         class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto p-4">
 
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 max-h-[90vh] overflow-y-auto my-8">
 
-        <div class="bg-white rounded-xl w-full max-w-lg p-6">
 
 
             <h2 class="text-xl font-bold mb-5">
@@ -364,78 +363,74 @@
 
 
 
-<script>
+    <script>
+        function openTambahModal() {
 
+            document.getElementById('tambahModal')
+                .classList.remove('hidden');
 
-function openTambahModal() {
+            document.getElementById('tambahModal')
+                .classList.add('flex');
 
-    document.getElementById('tambahModal')
-        .classList.remove('hidden');
-
-    document.getElementById('tambahModal')
-        .classList.add('flex');
-
-}
+        }
 
 
 
-function closeTambahModal() {
+        function closeTambahModal() {
 
-    document.getElementById('tambahModal')
-        .classList.add('hidden');
+            document.getElementById('tambahModal')
+                .classList.add('hidden');
 
-    document.getElementById('tambahModal')
-        .classList.remove('flex');
+            document.getElementById('tambahModal')
+                .classList.remove('flex');
 
-}
+        }
 
 
 
 
-function openEditModal(id, tanggal, keterangan) {
+        function openEditModal(id, tanggal, keterangan) {
 
 
-    document.getElementById('editModal')
-        .classList.remove('hidden');
+            document.getElementById('editModal')
+                .classList.remove('hidden');
 
 
-    document.getElementById('editModal')
-        .classList.add('flex');
-
-
-
-    document.getElementById('editForm').action =
-        '/pengembalian/' + id;
+            document.getElementById('editModal')
+                .classList.add('flex');
 
 
 
-    document.getElementById('edit_tanggal_pengembalian').value =
-        tanggal;
+            document.getElementById('editForm').action =
+                '/pengembalian/' + id;
 
 
 
-    document.getElementById('edit_keterangan').value =
-        keterangan ?? '';
-
-}
+            document.getElementById('edit_tanggal_pengembalian').value =
+                tanggal;
 
 
 
-function closeEditModal() {
+            document.getElementById('edit_keterangan').value =
+                keterangan ?? '';
+
+        }
 
 
-    document.getElementById('editModal')
-        .classList.add('hidden');
+
+        function closeEditModal() {
 
 
-    document.getElementById('editModal')
-        .classList.remove('flex');
+            document.getElementById('editModal')
+                .classList.add('hidden');
 
 
-}
+            document.getElementById('editModal')
+                .classList.remove('flex');
 
 
-</script>
+        }
+    </script>
 
 
 </x-app-layout>

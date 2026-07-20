@@ -19,9 +19,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
-                    {{ session('success') }}
-                </div>
+            <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
+                {{ session('success') }}
+            </div>
             @endif
 
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -92,15 +92,15 @@
 
                                 @if($item->status == 'Dipinjam')
 
-                                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
-                                        Dipinjam
-                                    </span>
+                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full">
+                                    Dipinjam
+                                </span>
 
                                 @else
 
-                                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                                        Dikembalikan
-                                    </span>
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                                    Dikembalikan
+                                </span>
 
                                 @endif
 
@@ -108,40 +108,36 @@
 
                             <td class="px-6 py-4">
 
-    <div class="flex justify-center gap-2">
+                                @if(Auth::user()->role == 'admin')
 
-        <button
-            onclick="openEditModal(
-                {{ $item->id }},
-                '{{ $item->nama_peminjam }}',
-                {{ $item->barang_id }},
-                {{ $item->jumlah }},
-                '{{ $item->tanggal_pinjam }}',
-                '{{ $item->tanggal_kembali }}',
-                '{{ $item->status }}',
-                '{{ $item->keterangan }}'
-            )"
-            class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
-            Edit
-        </button>
+                                <div class="flex justify-center gap-2">
 
+                                    <button
+                                        onclick="openEditModal(
+        '{{ $item->id }}',
+        '{{ $item->nama_ruangan }}',
+        '{{ $item->lantai }}',
+        '{{ $item->keterangan }}'
+        )"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
+                                        Edit
+                                    </button>
 
-        <form action="{{ route('peminjaman.destroy', $item->id) }}" method="POST">
+                                    <form action="{{ route('ruangan.destroy', $item->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
 
-            @csrf
-            @method('DELETE')
+                                        <button
+                                            onclick="return confirm('Yakin ingin menghapus data ini?')"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                            Hapus
+                                        </button>
+                                    </form>
 
-            <button
-                onclick="return confirm('Yakin ingin menghapus data ini?')"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-                Hapus
-            </button>
+                                </div>
 
-        </form>
-
-    </div>
-
-</td>
+                                @endif
+                            </td>
 
                         </tr>
 
@@ -169,9 +165,9 @@
 
     <!-- Modal Tambah -->
     <div id="tambahModal"
-         class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 overflow-y-auto p-4">
 
-        <div class="bg-white rounded-xl w-full max-w-lg p-6">
+        <div class="bg-white rounded-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto my-8">
 
             <h2 class="text-xl font-bold mb-5">
                 Tambah Peminjaman
@@ -203,9 +199,9 @@
 
                         @foreach($barang as $b)
 
-                            <option value="{{ $b->id }}">
-                                {{ $b->nama_barang }}
-                            </option>
+                        <option value="{{ $b->id }}">
+                            {{ $b->nama_barang }}
+                        </option>
 
                         @endforeach
 
@@ -249,7 +245,7 @@
 
                 </div>
 
-                                <div class="grid grid-cols-2 gap-4 mt-4">
+                <div class="grid grid-cols-2 gap-4 mt-4">
 
                     <div>
                         <label class="block mb-2">
@@ -317,175 +313,174 @@
     </div>
 
 
-        <!-- Modal Edit -->
-<div id="editModal"
-     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <!-- Modal Edit -->
+    <div id="editModal"
+        class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto p-4">
 
-    <div class="bg-white rounded-xl w-full max-w-lg p-6">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 max-h-[90vh] overflow-y-auto my-8">
 
-        <h2 class="text-xl font-bold mb-5">
-            Edit Peminjaman
-        </h2>
 
-        <form id="editForm" method="POST">
+            <h2 class="text-xl font-bold mb-5">
+                Edit Peminjaman
+            </h2>
 
-            @csrf
-            @method('PUT')
+            <form id="editForm" method="POST">
 
-            <div class="mb-4">
-                <label class="block mb-2">Nama Peminjam</label>
+                @csrf
+                @method('PUT')
 
-                <input
-                    id="edit_nama_peminjam"
-                    type="text"
-                    name="nama_peminjam"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-2">Barang</label>
-
-                <select
-                    id="edit_barang_id"
-                    name="barang_id"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-
-                    @foreach($barang as $b)
-                        <option value="{{ $b->id }}">
-                            {{ $b->nama_barang }}
-                        </option>
-                    @endforeach
-
-                </select>
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-2">Jumlah</label>
-
-                <input
-                    id="edit_jumlah"
-                    type="number"
-                    name="jumlah"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-2">Status</label>
-
-                <select
-                    id="edit_status"
-                    name="status"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-
-                    <option value="Dipinjam">Dipinjam</option>
-                    <option value="Dikembalikan">Dikembalikan</option>
-
-                </select>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mt-4">
-
-                <div>
-                    <label class="block mb-2">
-                        Tanggal Pinjam
-                    </label>
+                <div class="mb-4">
+                    <label class="block mb-2">Nama Peminjam</label>
 
                     <input
-                        id="edit_tanggal_pinjam"
-                        type="date"
-                        name="tanggal_pinjam"
+                        id="edit_nama_peminjam"
+                        type="text"
+                        name="nama_peminjam"
                         class="w-full border rounded-lg px-4 py-2"
                         required>
                 </div>
 
-                <div>
-                    <label class="block mb-2">
-                        Tanggal Kembali
-                    </label>
+                <div class="mb-4">
+                    <label class="block mb-2">Barang</label>
 
-                    <input
-                        id="edit_tanggal_kembali"
-                        type="date"
-                        name="tanggal_kembali"
-                        class="w-full border rounded-lg px-4 py-2">
+                    <select
+                        id="edit_barang_id"
+                        name="barang_id"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
+
+                        @foreach($barang as $b)
+                        <option value="{{ $b->id }}">
+                            {{ $b->nama_barang }}
+                        </option>
+                        @endforeach
+
+                    </select>
                 </div>
 
-            </div>
+                <div class="mb-4">
+                    <label class="block mb-2">Jumlah</label>
 
-            <div class="mt-4">
+                    <input
+                        id="edit_jumlah"
+                        type="number"
+                        name="jumlah"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
+                </div>
 
-                <label class="block mb-2">
-                    Keterangan
-                </label>
+                <div class="mb-4">
+                    <label class="block mb-2">Status</label>
 
-                <textarea
-                    id="edit_keterangan"
-                    name="keterangan"
-                    rows="3"
-                    class="w-full border rounded-lg px-4 py-2"></textarea>
+                    <select
+                        id="edit_status"
+                        name="status"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
 
-            </div>
+                        <option value="Dipinjam">Dipinjam</option>
+                        <option value="Dikembalikan">Dikembalikan</option>
 
-            <div class="flex justify-end gap-3 mt-6">
+                    </select>
+                </div>
 
-                <button
-                    type="button"
-                    onclick="closeEditModal()"
-                    class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
-                    Batal
-                </button>
+                <div class="grid grid-cols-2 gap-4 mt-4">
 
-                <button
-                    type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
-                    Update
-                </button>
+                    <div>
+                        <label class="block mb-2">
+                            Tanggal Pinjam
+                        </label>
 
-            </div>
+                        <input
+                            id="edit_tanggal_pinjam"
+                            type="date"
+                            name="tanggal_pinjam"
+                            class="w-full border rounded-lg px-4 py-2"
+                            required>
+                    </div>
 
-        </form>
+                    <div>
+                        <label class="block mb-2">
+                            Tanggal Kembali
+                        </label>
+
+                        <input
+                            id="edit_tanggal_kembali"
+                            type="date"
+                            name="tanggal_kembali"
+                            class="w-full border rounded-lg px-4 py-2">
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+
+                    <label class="block mb-2">
+                        Keterangan
+                    </label>
+
+                    <textarea
+                        id="edit_keterangan"
+                        name="keterangan"
+                        rows="3"
+                        class="w-full border rounded-lg px-4 py-2"></textarea>
+
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+
+                    <button
+                        type="button"
+                        onclick="closeEditModal()"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
+                        Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
+                        Update
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
-</div>
+    <script>
+        function openTambahModal() {
+            document.getElementById('tambahModal').classList.remove('hidden');
+            document.getElementById('tambahModal').classList.add('flex');
+        }
 
-<script>
+        function closeTambahModal() {
+            document.getElementById('tambahModal').classList.add('hidden');
+            document.getElementById('tambahModal').classList.remove('flex');
+        }
 
-function openTambahModal() {
-    document.getElementById('tambahModal').classList.remove('hidden');
-    document.getElementById('tambahModal').classList.add('flex');
-}
+        function openEditModal(id, nama, barang, jumlah, tanggal, kembali, status, keterangan) {
 
-function closeTambahModal() {
-    document.getElementById('tambahModal').classList.add('hidden');
-    document.getElementById('tambahModal').classList.remove('flex');
-}
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
 
-function openEditModal(id, nama, barang, jumlah, tanggal, kembali, status, keterangan) {
+            document.getElementById('editForm').action = '/peminjaman/' + id;
 
-    document.getElementById('editModal').classList.remove('hidden');
-    document.getElementById('editModal').classList.add('flex');
+            document.getElementById('edit_nama_peminjam').value = nama;
+            document.getElementById('edit_barang_id').value = barang;
+            document.getElementById('edit_jumlah').value = jumlah;
+            document.getElementById('edit_status').value = status;
+            document.getElementById('edit_tanggal_pinjam').value = tanggal;
+            document.getElementById('edit_tanggal_kembali').value = kembali ?? '';
+            document.getElementById('edit_keterangan').value = keterangan ?? '';
+        }
 
-    document.getElementById('editForm').action = '/peminjaman/' + id;
-
-    document.getElementById('edit_nama_peminjam').value = nama;
-    document.getElementById('edit_barang_id').value = barang;
-    document.getElementById('edit_jumlah').value = jumlah;
-    document.getElementById('edit_status').value = status;
-    document.getElementById('edit_tanggal_pinjam').value = tanggal;
-    document.getElementById('edit_tanggal_kembali').value = kembali ?? '';
-    document.getElementById('edit_keterangan').value = keterangan ?? '';
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-    document.getElementById('editModal').classList.remove('flex');
-}
-
-</script>
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
+        }
+    </script>
 
 </x-app-layout>

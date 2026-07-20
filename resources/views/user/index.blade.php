@@ -26,9 +26,9 @@
 
             @if(session('success'))
 
-                <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
-                    {{ session('success') }}
-                </div>
+            <div class="bg-green-100 text-green-700 p-4 rounded-lg mb-5">
+                {{ session('success') }}
+            </div>
 
             @endif
 
@@ -67,85 +67,92 @@
                     <tbody>
                         @foreach($users as $user)
 
-<tr class="border-b hover:bg-gray-50">
+                        <tr class="border-b hover:bg-gray-50">
 
-    <td class="px-6 py-4 text-center">
-        {{ $loop->iteration }}
-    </td>
+                            <td class="px-6 py-4 text-center">
+                                {{ $loop->iteration }}
+                            </td>
 
-    <td class="px-6 py-4">
-        {{ $user->name }}
-    </td>
+                            <td class="px-6 py-4">
+                                {{ $user->name }}
+                            </td>
 
-    <td class="px-6 py-4">
-        {{ $user->email }}
-    </td>
+                            <td class="px-6 py-4">
+                                {{ $user->email }}
+                            </td>
 
-    <td class="px-6 py-4 text-center">
-        {{ ucfirst($user->role) }}
-    </td>
+                            <td class="px-6 py-4 text-center">
+                                {{ ucfirst($user->role) }}
+                            </td>
 
-    <td class="px-6 py-4">
+                            <td class="px-6 py-4">
 
-        <div class="flex justify-center gap-2">
+                                @if(Auth::user()->role == 'admin')
 
-            <button
-                onclick="openEditModal(
-                    {{ $user->id }},
-                    '{{ $user->name }}',
-                    '{{ $user->email }}',
-                    '{{ $user->role }}'
-                )"
-                class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
+                                <div class="flex justify-center gap-2">
 
-                Edit
+                                    <button
+                                        onclick="openEditModal(
+    '{{ $user->id }}',
+    '{{ $user->name }}',
+    '{{ $user->email }}',
+    '{{ $user->role }}'
+)"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
+                                        Edit
+                                    </button>
 
-            </button>
+                                    <form action="{{ route('user.destroy', $user->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button
+                                            onclick="return confirm('Yakin ingin menghapus data ini?')"
+                                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                                            Hapus
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                                @endif
+
+                            </td>
+
+                        </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Modal Tambah -->
+    <div id="tambahModal"
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+
+        <div class="bg-white rounded-xl w-full max-w-lg p-6">
+
+            <h2 class="text-xl font-bold mb-5">
+                Tambah User
+            </h2>
 
             <form action="{{ route('user.destroy', $user->id) }}" method="POST">
-
                 @csrf
                 @method('DELETE')
 
                 <button
                     onclick="return confirm('Yakin ingin menghapus user ini?')"
                     class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-
                     Hapus
-
                 </button>
-
             </form>
-
-        </div>
-
-    </td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- Modal Tambah -->
-<div id="tambahModal"
-     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-
-    <div class="bg-white rounded-xl w-full max-w-lg p-6">
-
-        <h2 class="text-xl font-bold mb-5">
-            Tambah User
-        </h2>
-
-        <form action="{{ route('user.store') }}" method="POST">
 
             @csrf
 
@@ -189,8 +196,13 @@
                     <option value="admin">
                         Admin
                     </option>
+                    <option value="siswa">
+                        Siswa
+                    </option>
 
                 </select>
+
+
             </div>
 
             <div class="flex justify-end gap-3 mt-6">
@@ -214,197 +226,199 @@
 
             </div>
 
-        </form>
+            </form>
+
+        </div>
 
     </div>
 
-</div>
+    <!-- Modal Edit User -->
 
-<!-- Modal Edit User -->
+    <div id="editModal"
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
 
-<div id="editModal"
-     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl w-full max-w-lg p-6">
 
-    <div class="bg-white rounded-xl w-full max-w-lg p-6">
-
-        <h2 class="text-xl font-bold mb-5">
-            Edit User
-        </h2>
+            <h2 class="text-xl font-bold mb-5">
+                Edit User
+            </h2>
 
 
-        <form id="editForm" method="POST">
+            <form id="editForm" method="POST">
 
-            @csrf
-            @method('PUT')
-
-
-            <div class="mb-4">
-
-                <label class="block mb-2">
-                    Nama
-                </label>
-
-                <input
-                    id="edit_name"
-                    type="text"
-                    name="name"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-
-            </div>
+                @csrf
+                @method('PUT')
 
 
-            <div class="mb-4">
+                <div class="mb-4">
 
-                <label class="block mb-2">
-                    Email
-                </label>
+                    <label class="block mb-2">
+                        Nama
+                    </label>
 
-                <input
-                    id="edit_email"
-                    type="email"
-                    name="email"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
+                    <input
+                        id="edit_name"
+                        type="text"
+                        name="name"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
 
-            </div>
-
-
-            <div class="mb-4">
-
-                <label class="block mb-2">
-                    Password
-                </label>
-
-                <input
-                    id="edit_password"
-                    type="password"
-                    name="password"
-                    class="w-full border rounded-lg px-4 py-2">
-
-                <small class="text-gray-500">
-                    Kosongkan jika tidak ingin mengganti password
-                </small>
-
-            </div>
-
-            <!-- Tambahkan Role di sini -->
-
-<div class="mb-4">
-
-    <label class="block mb-2">
-        Role
-    </label>
-
-    <select
-        id="edit_role"
-        name="role"
-        class="w-full border rounded-lg px-4 py-2">
-
-        <option value="admin">
-            Admin
-        </option>
-
-    </select>
-
-</div>
-
-            <div class="flex justify-end gap-3">
-
-                <button
-                    type="button"
-                    onclick="closeEditModal()"
-                    class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
-
-                    Batal
-
-                </button>
+                </div>
 
 
-                <button
-                    type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
+                <div class="mb-4">
 
-                    Update
+                    <label class="block mb-2">
+                        Email
+                    </label>
 
-                </button>
+                    <input
+                        id="edit_email"
+                        type="email"
+                        name="email"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
+
+                </div>
 
 
-            </div>
+                <div class="mb-4">
+
+                    <label class="block mb-2">
+                        Password
+                    </label>
+
+                    <input
+                        id="edit_password"
+                        type="password"
+                        name="password"
+                        class="w-full border rounded-lg px-4 py-2">
+
+                    <small class="text-gray-500">
+                        Kosongkan jika tidak ingin mengganti password
+                    </small>
+
+                </div>
+
+                <!-- Tambahkan Role di sini -->
+
+                <div class="mb-4">
+
+                    <label class="block mb-2">
+                        Role
+                    </label>
+
+                    <select
+                        id="edit_role"
+                        name="role"
+                        class="w-full border rounded-lg px-4 py-2">
+
+                        <option value="admin">
+                            Admin
+                        </option>
+
+                        <option value="siswa">
+                            Siswa
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="flex justify-end gap-3">
+
+                    <button
+                        type="button"
+                        onclick="closeEditModal()"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
+
+                        Batal
+
+                    </button>
 
 
-        </form>
+                    <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
 
+                        Update
+
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
 
     </div>
 
-</div>
+    <script>
+        function openTambahModal() {
 
-<script>
+            document.getElementById('tambahModal')
+                .classList.remove('hidden');
 
-function openTambahModal() {
+            document.getElementById('tambahModal')
+                .classList.add('flex');
 
-    document.getElementById('tambahModal')
-        .classList.remove('hidden');
-
-    document.getElementById('tambahModal')
-        .classList.add('flex');
-
-}
+        }
 
 
-function closeTambahModal() {
+        function closeTambahModal() {
 
-    document.getElementById('tambahModal')
-        .classList.add('hidden');
+            document.getElementById('tambahModal')
+                .classList.add('hidden');
 
-    document.getElementById('tambahModal')
-        .classList.remove('flex');
+            document.getElementById('tambahModal')
+                .classList.remove('flex');
 
-}
+        }
 
 
 
-function openEditModal(id, name, email, role) {
+        function openEditModal(id, name, email, role) {
 
 
-    document.getElementById('editModal')
-        .classList.remove('hidden');
+            document.getElementById('editModal')
+                .classList.remove('hidden');
 
-    document.getElementById('editModal')
-        .classList.add('flex');
-
-
-    document.getElementById('editForm').action =
-        '/user/' + id;
+            document.getElementById('editModal')
+                .classList.add('flex');
 
 
-    document.getElementById('edit_name').value = name;
-
-    document.getElementById('edit_email').value = email;
-
-    document.getElementById('edit_password').value = '';
-
-    document.getElementById('edit_role').value = role;
+            document.getElementById('editForm').action =
+                '/user/' + id;
 
 
-}
+            document.getElementById('edit_name').value = name;
+
+            document.getElementById('edit_email').value = email;
+
+            document.getElementById('edit_password').value = '';
+
+            document.getElementById('edit_role').value = role;
+
+
+        }
 
 
 
-function closeEditModal() {
+        function closeEditModal() {
 
 
-    document.getElementById('editModal')
-        .classList.add('hidden');
+            document.getElementById('editModal')
+                .classList.add('hidden');
 
 
-    document.getElementById('editModal')
-        .classList.remove('flex');
+            document.getElementById('editModal')
+                .classList.remove('flex');
 
 
-}
-
-</script>
+        }
+    </script>
 
 </x-app-layout>

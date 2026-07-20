@@ -17,6 +17,10 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
@@ -36,6 +40,10 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -59,6 +67,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $user->delete();
 
         return back()->with('success', 'User berhasil dihapus.');

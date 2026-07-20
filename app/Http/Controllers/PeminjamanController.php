@@ -18,6 +18,10 @@ class PeminjamanController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'nama_peminjam' => 'required',
             'barang_id' => 'required',
@@ -28,13 +32,31 @@ class PeminjamanController extends Controller
             'keterangan' => 'nullable',
         ]);
 
+        $barang = Barang::find($request->barang_id);
+
+        if ($request->jumlah > $barang->jumlah) {
+            return back()->with('error', 'Stok barang tidak mencukupi.');
+        }
+
+        // Simpan data peminjaman
         Peminjaman::create($request->all());
+
+        // Kurangi stok barang
+        $barang = Barang::find($request->barang_id);
+
+        $barang->update([
+            'jumlah' => $barang->jumlah - $request->jumlah
+        ]);
 
         return back()->with('success', 'Data peminjaman berhasil ditambahkan.');
     }
 
     public function update(Request $request, Peminjaman $peminjaman)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'nama_peminjam' => 'required',
             'barang_id' => 'required',
@@ -44,6 +66,12 @@ class PeminjamanController extends Controller
             'status' => 'required',
             'keterangan' => 'nullable',
         ]);
+
+        $barang = Barang::find($request->barang_id);
+
+        if ($request->jumlah > $barang->jumlah) {
+            return back()->with('error', 'Stok barang tidak mencukupi.');
+        }
 
         $peminjaman->update($request->all());
 
@@ -52,6 +80,10 @@ class PeminjamanController extends Controller
 
     public function destroy(Peminjaman $peminjaman)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $peminjaman->delete();
 
         return back()->with('success', 'Data peminjaman berhasil dihapus.');

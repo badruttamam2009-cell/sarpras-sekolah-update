@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengembalian;
 use App\Models\Peminjaman;
+use App\Models\Barang;
 use Illuminate\Http\Request;
 
 class PengembalianController extends Controller
@@ -19,6 +20,10 @@ class PengembalianController extends Controller
 
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'peminjaman_id' => 'required',
             'tanggal_pengembalian' => 'required|date',
@@ -33,6 +38,14 @@ class PengembalianController extends Controller
 
         $pinjam = Peminjaman::find($request->peminjaman_id);
 
+        // Tambahkan kembali stok barang
+        $barang = Barang::find($pinjam->barang_id);
+
+        $barang->update([
+            'jumlah' => $barang->jumlah + $pinjam->jumlah
+        ]);
+
+        // Ubah status peminjaman
         $pinjam->update([
             'status' => 'Dikembalikan'
         ]);
@@ -42,6 +55,10 @@ class PengembalianController extends Controller
 
     public function update(Request $request, Pengembalian $pengembalian)
     {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
+
         $request->validate([
             'tanggal_pengembalian' => 'required|date',
             'keterangan' => 'nullable',
@@ -56,15 +73,26 @@ class PengembalianController extends Controller
     }
 
     public function destroy(Pengembalian $pengembalian)
-{
-    $peminjaman = $pengembalian->peminjaman;
+    {
+        if (auth()->user()->role != 'admin') {
+            abort(403);
+        }
 
-    $pengembalian->delete();
+        $peminjaman = $pengembalian->peminjaman;
 
-    $peminjaman->update([
-        'status' => 'Dipinjam'
-    ]);
+        // Kurangi lagi stok barang karena pengembalian dibatalkan
+        $barang = Barang::find($peminjaman->barang_id);
 
-    return back()->with('success', 'Data pengembalian berhasil dihapus.');
-}
+        $barang->update([
+            'jumlah' => $barang->jumlah - $peminjaman->jumlah
+        ]);
+
+        $pengembalian->delete();
+
+        $peminjaman->update([
+            'status' => 'Dipinjam'
+        ]);
+
+        return back()->with('success', 'Data pengembalian berhasil dihapus.');
+    }
 }

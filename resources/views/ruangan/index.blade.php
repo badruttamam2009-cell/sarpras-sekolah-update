@@ -5,11 +5,13 @@
                 Data Ruangan
             </h2>
 
+            @if(Auth::user()->role == 'admin')
             <button
                 onclick="openTambahModal()"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow">
                 + Tambah Ruangan
             </button>
+            @endif
         </div>
     </x-slot>
 
@@ -18,9 +20,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             @if(session('success'))
-                <div class="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
-                    {{ session('success') }}
-                </div>
+            <div class="mb-4 p-4 rounded-lg bg-green-100 text-green-700">
+                {{ session('success') }}
+            </div>
             @endif
 
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -47,7 +49,7 @@
 
                     <tbody>
 
-                    @forelse($ruangan as $item)
+                        @forelse($ruangan as $item)
 
                         <tr class="border-b hover:bg-gray-50">
 
@@ -70,43 +72,41 @@
 
                             <td class="px-6 py-4">
 
+                                @if(Auth::user()->role == 'admin')
+
                                 <div class="flex justify-center gap-2">
 
                                     <button
                                         onclick="openEditModal(
-                                        '{{ $item->id }}',
-                                        '{{ $item->nama_ruangan }}',
-                                        '{{ $item->lantai }}',
-                                        '{{ $item->keterangan }}'
-                                        )"
+        '{{ $item->id }}',
+        '{{ $item->nama_ruangan }}',
+        '{{ $item->lantai }}',
+        '{{ $item->keterangan }}'
+        )"
                                         class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">
                                         Edit
                                     </button>
 
-                                    <form
-                                        action="{{ route('ruangan.destroy',$item->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-
+                                    <form action="{{ route('ruangan.destroy', $item->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
 
                                         <button
+                                            onclick="return confirm('Yakin ingin menghapus data ini?')"
                                             class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-
                                             Hapus
-
                                         </button>
-
                                     </form>
 
                                 </div>
+
+                                @endif
 
                             </td>
 
                         </tr>
 
-                    @empty
+                        @empty
 
                         <tr>
 
@@ -119,7 +119,7 @@
 
                         </tr>
 
-                    @endforelse
+                        @endforelse
 
                     </tbody>
 
@@ -131,206 +131,205 @@
 
     </div>
 
-   <!-- Modal Tambah -->
-<div id="modalTambah"
-     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <!-- Modal Tambah -->
+    <<div id="modalTambah"
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 overflow-y-auto p-4">
 
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+        <div class="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 max-h-[90vh] overflow-y-auto my-8">
 
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-bold">Tambah Data Ruangan</h2>
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-bold">Tambah Data Ruangan</h2>
 
-            <button onclick="closeTambahModal()"
-                class="text-gray-500 hover:text-red-600 text-2xl">
-                &times;
-            </button>
+                <button onclick="closeTambahModal()"
+                    class="text-gray-500 hover:text-red-600 text-2xl">
+                    &times;
+                </button>
+            </div>
+
+            <form action="{{ route('ruangan.store') }}" method="POST">
+
+                @csrf
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">
+                        Nama Ruangan
+                    </label>
+
+                    <input
+                        type="text"
+                        name="nama_ruangan"
+                        class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                        required>
+                </div>
+
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">
+                        Lantai
+                    </label>
+
+                    <input
+                        type="text"
+                        name="lantai"
+                        class="w-full border rounded-lg px-4 py-2"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block mb-2 font-medium">
+                        Keterangan
+                    </label>
+
+                    <textarea
+                        name="keterangan"
+                        rows="3"
+                        class="w-full border rounded-lg px-4 py-2"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3">
+
+                    <button
+                        type="button"
+                        onclick="closeTambahModal()"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
+
+                        Batal
+
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
+
+                        Simpan
+
+                    </button>
+
+                </div>
+
+            </form>
+
         </div>
 
-        <form action="{{ route('ruangan.store') }}" method="POST">
+        </div>
+        <!-- Modal Edit -->
+        <div id="modalEdit"
+            class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50 overflow-y-auto p-4">
 
-            @csrf
+            <div class="bg-white w-full max-w-lg rounded-xl shadow-lg p-6 max-h-[90vh] overflow-y-auto my-8">
 
-            <div class="mb-4">
-                <label class="block mb-2 font-medium">
-                    Nama Ruangan
-                </label>
+                <div class="flex justify-between items-center mb-5">
+                    <h2 class="text-xl font-bold">
+                        Edit Data Ruangan
+                    </h2>
 
-                <input
-                    type="text"
-                    name="nama_ruangan"
-                    class="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
-                    required>
+                    <button onclick="closeEditModal()" class="text-2xl text-gray-500 hover:text-red-600">
+                        &times;
+                    </button>
+                </div>
+
+                <form id="formEdit" method="POST">
+
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-4">
+                        <label class="block mb-2 font-medium">
+                            Nama Ruangan
+                        </label>
+
+                        <input
+                            type="text"
+                            id="edit_nama_ruangan"
+                            name="nama_ruangan"
+                            class="w-full border rounded-lg px-4 py-2"
+                            required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block mb-2 font-medium">
+                            Lantai
+                        </label>
+
+                        <input
+                            type="text"
+                            id="edit_lantai"
+                            name="lantai"
+                            class="w-full border rounded-lg px-4 py-2"
+                            required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block mb-2 font-medium">
+                            Keterangan
+                        </label>
+
+                        <textarea
+                            id="edit_keterangan"
+                            name="keterangan"
+                            rows="3"
+                            class="w-full border rounded-lg px-4 py-2"></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+
+                        <button
+                            type="button"
+                            onclick="closeEditModal()"
+                            class="bg-gray-500 text-white px-5 py-2 rounded-lg">
+
+                            Batal
+
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg">
+
+                            Update
+
+                        </button>
+
+                    </div>
+
+                </form>
+
             </div>
 
-
-            <div class="mb-4">
-                <label class="block mb-2 font-medium">
-                    Lantai
-                </label>
-
-                <input
-                    type="text"
-                    name="lantai"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-            </div>
-
-            <div class="mb-4">
-                <label class="block mb-2 font-medium">
-                    Keterangan
-                </label>
-
-                <textarea
-                    name="keterangan"
-                    rows="3"
-                    class="w-full border rounded-lg px-4 py-2"></textarea>
-            </div>
-
-            <div class="flex justify-end gap-3">
-
-                <button
-                    type="button"
-                    onclick="closeTambahModal()"
-                    class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg">
-
-                    Batal
-
-                </button>
-
-                <button
-                    type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
-
-                    Simpan
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-    <!-- Modal Edit -->
-<div id="modalEdit" class="fixed inset-0 hidden items-center justify-center bg-black bg-opacity-50 z-50">
-
-    <div class="bg-white w-full max-w-lg rounded-xl shadow-lg p-6">
-
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-bold">
-                Edit Data Ruangan
-            </h2>
-
-            <button onclick="closeEditModal()" class="text-2xl text-gray-500 hover:text-red-600">
-                &times;
-            </button>
         </div>
 
-        <form id="formEdit" method="POST">
+        <script>
+            function openTambahModal() {
+                const modal = document.getElementById('modalTambah');
 
-            @csrf
-            @method('PUT')
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
 
-            <div class="mb-4">
-                <label class="block mb-2 font-medium">
-                    Nama Ruangan
-                </label>
+            function closeTambahModal() {
+                const modal = document.getElementById('modalTambah');
 
-                <input
-                    type="text"
-                    id="edit_nama_ruangan"
-                    name="nama_ruangan"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-            </div>
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
 
-            <div class="mb-4">
-                <label class="block mb-2 font-medium">
-                    Lantai
-                </label>
+            function openEditModal(id, nama_ruangan, lantai, keterangan) {
 
-                <input
-                    type="text"
-                    id="edit_lantai"
-                    name="lantai"
-                    class="w-full border rounded-lg px-4 py-2"
-                    required>
-            </div>
+                document.getElementById('edit_nama_ruangan').value = nama_ruangan;
+                document.getElementById('edit_lantai').value = lantai;
+                document.getElementById('edit_keterangan').value = keterangan;
 
-            <div class="mb-4">
-                <label class="block mb-2 font-medium">
-                    Keterangan
-                </label>
+                document.getElementById('formEdit').action = "/ruangan/" + id;
 
-                <textarea
-                    id="edit_keterangan"
-                    name="keterangan"
-                    rows="3"
-                    class="w-full border rounded-lg px-4 py-2"></textarea>
-            </div>
+                document.getElementById('modalEdit').classList.remove('hidden');
+                document.getElementById('modalEdit').classList.add('flex');
+            }
 
-            <div class="flex justify-end gap-3">
+            function closeEditModal() {
 
-                <button
-                    type="button"
-                    onclick="closeEditModal()"
-                    class="bg-gray-500 text-white px-5 py-2 rounded-lg">
-
-                    Batal
-
-                </button>
-
-                <button
-                    type="submit"
-                    class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg">
-
-                    Update
-
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-   <script>
-
-function openTambahModal() {
-    const modal = document.getElementById('modalTambah');
-
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-}
-
-function closeTambahModal() {
-    const modal = document.getElementById('modalTambah');
-
-    modal.classList.remove('flex');
-    modal.classList.add('hidden');
-}
-
-function openEditModal(id, nama_ruangan, lantai, keterangan) {
-
-    document.getElementById('edit_nama_ruangan').value = nama_ruangan;
-    document.getElementById('edit_lantai').value = lantai;
-    document.getElementById('edit_keterangan').value = keterangan;
-
-    document.getElementById('formEdit').action = "/ruangan/" + id;
-
-    document.getElementById('modalEdit').classList.remove('hidden');
-    document.getElementById('modalEdit').classList.add('flex');
-}
-
-function closeEditModal() {
-
-    document.getElementById('modalEdit').classList.remove('flex');
-    document.getElementById('modalEdit').classList.add('hidden');
-}
-
-</script>
+                document.getElementById('modalEdit').classList.remove('flex');
+                document.getElementById('modalEdit').classList.add('hidden');
+            }
+        </script>
 
 </x-app-layout>
