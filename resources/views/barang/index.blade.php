@@ -104,7 +104,7 @@
             <div class="bg-white rounded-xl shadow-lg">
                 <div class="overflow-x-auto">
 
-                    <table class="min-w-full">
+                    <table id="barangTable" class="min-w-full">
 
                         <thead class="bg-blue-600 text-white">
 
